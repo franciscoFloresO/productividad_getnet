@@ -1,0 +1,8 @@
+<h1>Borrar Categoria</h1>
+<p>¿Estás seguro de que quieres borrar la categoria "{{ object.nombre }}"?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, borrar</button>
+    <a href="{% url 'categoria_lista' %}">Cancelar</a>
+</form>

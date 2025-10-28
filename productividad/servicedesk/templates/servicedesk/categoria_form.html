@@ -1,0 +1,25 @@
+<h1>{% if object %}Editar Categoria{% else %}Crear Categoria{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div>
+        {{ form.nombre.label_tag }}
+        {{ form.nombre }}
+        {{ form.nombre.errors }}
+    </div>
+    
+    <div style="margin-top: 20px;">
+        {{ form.categorias_permitidas.label_tag }}
+        {% for checkbox in form.categorias_permitidas %}
+            <div>
+                {{ checkbox.tag }}
+                <label for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+            </div>
+        {% endfor %}
+        {{ form.categorias_permitidas.errors }}
+    </div>
+    
+    <button type="submit">Guardar</button>
+    <a href="{% url 'categoria_lista' %}">Cancelar</a>
+</form>

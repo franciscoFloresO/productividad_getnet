@@ -1,0 +1,15 @@
+<h1>Gestión de categoria</h1>
+<a href="{% url 'categoria_crear' %}">Crear Nuevo categoria</a>
+<hr>
+<ul>
+    {% for categoria in categorias %}
+      <li>
+        {{ cattegoria.nombre }}
+        <a href="{% url 'categoria_editar' categoria.pk %}">(Editar)</a>
+        <a href="{% url 'categoria_borrar' categoria.pk %}">(Borrar)</a>
+      </li>
+    {% empty %}
+      <li>No hay categorias.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'registro_crear' %}">Volver al formulario</a>

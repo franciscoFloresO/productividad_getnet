@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Productividad</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; max-width: 600px; }
+        form div { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        select, textarea, input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { background: #003366; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>{{ page_title|default:"Formulario" }}</h1>
+
+    <form method="post" id="registroForm">
+        {% csrf_token %}
+        
+        <div>
+            {{ form.cliente.label_tag }}
+            {{ form.cliente }}
+            {{ form.cliente.errors }}
+        </div>
+        
+        <div>
+            {{ form.categoria.label_tag }}
+            {{ form.categoria }}
+            {{ form.categoria.errors }}
+        </div>
+        
+        <div>
+            {{ form.origen_contacto.label_tag }}
+            {{ form.origen_contacto }}
+            {{ form.origen_contacto.errors }}
+        </div>
+        
+        <div>
+            {{ form.comentarios.label_tag }}
+            {{ form.comentarios }}
+            {{ form.comentarios.errors }}
+        </div>
+
+        <button type="submit">Enviar</button>
+    </form>
+
+    <hr>
+    <nav>
+        <a href="{% url 'cliente_lista' %}">Gestionar Clientes</a> | 
+        <a href="{% url 'categoria_lista' %}">Gestionar Categorías</a>
+    </nav>
+
+    <script>
+        // Espera a que el documento esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Obtenemos los dos <select>
+            const clienteSelect = document.getElementById('id_cliente');
+            const categoriaSelect = document.getElementById('id_categoria');
+            
+            // URL de nuestra vista AJAX
+            const url = "{% url 'cargar_categorias_ajax' %}";
+
+            // Añadimos un "escuchador" al <select> de clientes
+            clienteSelect.addEventListener('change', function() {
+                const clienteId = this.value; // Obtenemos el ID del cliente seleccionado
+                
+                // Si el ID está vacío (ej. seleccionó "---"),
+                // limpiamos el <select> de categorías y terminamos
+                if (!clienteId) {
+                    categoriaSelect.innerHTML = '<option value="">---</option>';
+                    return;
+                }
+
+                // Usamos Fetch para llamar a nuestra vista AJAX
+                fetch(`${url}?cliente_id=${clienteId}`)
+                    .then(response => response.json()) // Convertimos la respuesta a JSON
+                    .then(data => {
+                        // Limpiamos el <select> de categorías
+                        categoriaSelect.innerHTML = ''; 
+                        
+                        // Añadimos la opción "---" por defecto
+                        let defaultOption = new Option('---', '');
+                        categoriaSelect.add(defaultOption);
+
+                        // Llenamos el <select> con las nuevas opciones
+                        data.forEach(function(categoria) {
+                            let option = new Option(categoria.nombre, categoria.id);
+                            categoriaSelect.add(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error cargando categorías:', error);
+                    });
+            });
+
+            // Opcional: Si el formulario se carga con un cliente ya seleccionado
+            // (al editar o si falla la validación), disparamos el evento 'change'
+            // para que cargue las categorías correspondientes.
+            if (clienteSelect.value) {
+                clienteSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+    </body>
+</html>
